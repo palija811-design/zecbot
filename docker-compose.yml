@@ -1,0 +1,23 @@
+# docker-compose.yml
+# Util para PROBAR EN LOCAL antes de subir a Easypanel.
+# En Easypanel no usaras este archivo: alli defines las variables
+# de entorno en el panel y montas el volumen desde la UI.
+
+services:
+  freqtrade:
+    build: .
+    # Alternativa sin build (imagen oficial directa):
+    # image: freqtradeorg/freqtrade:stable
+    restart: unless-stopped
+    container_name: ft_zec
+    volumes:
+      # Volumen persistente: historial de trades (sqlite) + logs.
+      # SIN esto, cada redeploy borra el historial de operaciones.
+      - "./user_data:/freqtrade/user_data"
+    env_file:
+      # Carga las variables desde .env (que NO se sube a GitHub).
+      - .env
+    command: >
+      trade
+      --config /freqtrade/config.json
+      --strategy MA10TouchStrategy
